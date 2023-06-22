@@ -1,0 +1,42 @@
+version: '3.6'
+services:
+  app:
+    container_name: go_market
+    build: .
+    ports:
+      - '8080:8080'
+    environment:
+      - DB_HOST=go_market_db
+      - DB_USER=postgres
+      - DB_NAME=go_market
+      - DB_PORT=5432
+    depends_on:
+      - db
+    networks:
+      - app-networks
+  
+  db:
+    container_name: go_market_db
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=go_market
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - app-networks
+  
+  prometheus:
+    container_name: go_prometheus
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - '9090:9090'
+    networks:
+      - app-networks
+      
+networks:
+  app-networks:
